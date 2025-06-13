@@ -150,7 +150,7 @@ REST_FRAMEWORK = {
         'rest_framework.permissions.IsAuthenticated',
     ],
     'DEFAULT_SCHEMA_CLASS': 'drf_spectacular.openapi.AutoSchema',
-    'DEFAULT_VERSIONING_CLASS': 'rest_framework.versioning.URLPathVersioning',
+    'DEFAULT_VERSIONING_CLASS': 'rest_framework.versioning.NamespaceVersioning',
     'DEFAULT_VERSION': 'v1',
     'ALLOWED_VERSIONS': ['v1'],
     'VERSION_PARAM': 'version',
@@ -158,7 +158,7 @@ REST_FRAMEWORK = {
 
 SIMPLE_JWT = {
    'AUTH_HEADER_TYPES': ('JWT',),
-   'ACCESS_TOKEN_LIFETIME': timedelta(minutes=60),
+   'ACCESS_TOKEN_LIFETIME': timedelta(minutes=15),
    'REFRESH_TOKEN_LIFETIME': timedelta(days=1),
    'BLACKLIST_AFTER_ROTATION': True,
    'ROTATE_REFRESH_TOKENS': True,
@@ -202,7 +202,7 @@ SPECTACULAR_SETTINGS = {
     'DESCRIPTION': 'API системы обращения в техническую поддержку.',
     'VERSION': '1.0',
     'SCHEMA_PATH_PREFIX_TRIM': False,
-    'SERVE_INCLUDE_SCHEMA': False,
+    'SERVE_INCLUDE_SCHEMA': True,
     'SCHEMA_PATH_PREFIX': '/api/v1',
 }
 
