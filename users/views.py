@@ -6,6 +6,7 @@ from rest_framework_simplejwt.exceptions import TokenError
 from rest_framework_simplejwt.tokens import RefreshToken
 from rest_framework_simplejwt.views import TokenObtainPairView, TokenRefreshView
 from rest_framework_simplejwt.serializers import TokenObtainPairSerializer, TokenRefreshSerializer, TokenVerifySerializer
+from rest_framework_simplejwt.token_blacklist.models import OutstandingToken, BlacklistedToken
 from users.serializers import LogoutSerializer
 from djoser.views import UserViewSet as DjoserUserViewSet
 from drf_spectacular.utils import extend_schema_view, extend_schema
@@ -13,7 +14,7 @@ from drf_spectacular.utils import extend_schema_view, extend_schema
 
 @extend_schema_view(
     post=extend_schema(
-        summary="Выход и удаление токена",
+        summary="Выход и добавление токена в чёрный список (blacklist)",
     )
 )
 class LogoutView(APIView):
@@ -23,11 +24,15 @@ class LogoutView(APIView):
     def post(self, request):
         try:
             refresh_token = request.data["refresh"]
-            token = RefreshToken(refresh_token)
-            token.blacklist()
+            outstanding_token = OutstandingToken.objects.get(token=refresh_token)
+            BlacklistedToken.objects.get_or_create(token=outstanding_token)
+
             return Response(status=status.HTTP_205_RESET_CONTENT)
+
         except KeyError:
             return Response({"detail": "Refresh token is required."}, status=status.HTTP_400_BAD_REQUEST)
+        except OutstandingToken.DoesNotExist:
+            return Response({"detail": "Token not found in outstanding tokens."}, status=status.HTTP_400_BAD_REQUEST)
         except TokenError:
             return Response({"detail": "Invalid or expired token."}, status=status.HTTP_400_BAD_REQUEST)
         
@@ -38,7 +43,6 @@ class LoginView(TokenObtainPairView):
     @extend_schema(
         summary="Вход по email и паролю",
         description="Возвращает access и refresh токены, если аутентификация выполнена успешно.",
-        responses=200,
     )
     def post(self, request, *args, **kwargs):
         return super().post(request, *args, **kwargs)
@@ -50,7 +54,6 @@ class RefreshView(TokenRefreshView):
     @extend_schema(
         summary="Обновление access токена",
         description="Принимает refresh токен и возвращает новый access токен.",
-        responses=200,
     )
     def post(self, request, *args, **kwargs):
         return super().post(request, *args, **kwargs)
@@ -63,7 +66,6 @@ class VerifyView(TokenObtainPairView):
     @extend_schema(
         summary="Проверка валидности access токена",
         description="Позволяет проверить, действителен ли access токен.",
-        responses=200,
     )
     def post(self, request, *args, **kwargs):
         return super().post(request, *args, **kwargs)
