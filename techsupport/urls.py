@@ -16,23 +16,9 @@ Including another URLconf
 """
 from django.contrib import admin
 from django.urls import include, path
-from drf_spectacular.views import SpectacularAPIView, SpectacularSwaggerView
-from rest_framework_simplejwt.views import TokenObtainPairView, TokenRefreshView
 
-from users.views import LoginView, LogoutView, RefreshView, VerifyView
 
 urlpatterns = [
-    path('api/v1/admin/', admin.site.urls),
-    path('api/v1/tickets/', include('tickets.urls')),
-    path('api/v1/users/', include('users.urls')),
-    path('api/v1/notifications/', include('notifications.urls')),
-
-    path('api/v1/auth/login/', LoginView.as_view(), name='login'),
-    path('api/v1/auth/logout/', LogoutView.as_view(), name='logout'),
-    path('api/v1/auth/jwt/refresh/', RefreshView.as_view(), name='refresh-jwt'),
-    path('api/v1/auth/jwt/verify/', VerifyView.as_view(), name='verify-jwt'),
-    
-    # Документация drf-spectacular
-    path('api/v1/schema/', SpectacularAPIView.as_view(), name='schema'),
-    path('api/v1/schema/swagger-ui/', SpectacularSwaggerView.as_view(url_name='schema'), name='swagger-ui'),
+    path('admin/', admin.site.urls),
+    path('api/v1/', include('api.urls')),
 ]

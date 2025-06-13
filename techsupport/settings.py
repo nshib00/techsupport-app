@@ -52,6 +52,7 @@ INSTALLED_APPS = [
     'users.apps.UsersConfig',
     'tickets.apps.TicketsConfig',
     'notifications.apps.NotificationsConfig',
+    'api.apps.ApiConfig',
 ]
 
 MIDDLEWARE = [
