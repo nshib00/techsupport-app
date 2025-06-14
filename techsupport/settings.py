@@ -54,6 +54,7 @@ INSTALLED_APPS = [
     'tickets.apps.TicketsConfig',
     'notifications.apps.NotificationsConfig',
     'api.apps.ApiConfig',
+    'admin.apps.AdminConfig',
 ]
 
 MIDDLEWARE = [
@@ -219,7 +220,7 @@ SPECTACULAR_SETTINGS = {
 
 
 CORS_ALLOWED_ORIGINS = [
-    "http://localhost:3000",
+    "http://127.0.0.1:8000",
 ]
 
 
