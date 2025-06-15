@@ -30,9 +30,9 @@ class UserListView(ListAPIView):
     permission_classes = [IsAdminUser, IsAuthenticated]
 
     def get_queryset(self):
-        role = self.request.GET.get('role')
-        if role not in User.ROLE_CHOICES:
-            raise ValidationError({'role': 'Недопустимое значение роли.'})
+        role = self.request.GET.get('role', None)
         if role is not None:
+            if role not in User.ROLE_CHOICES:
+                raise ValidationError({'role': 'Недопустимое значение роли.'})
             return User.objects.filter(role=role)
         return User.objects.all()
