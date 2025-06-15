@@ -1,4 +1,4 @@
-from rest_framework import generics, mixins
+from rest_framework import generics
 from rest_framework.permissions import IsAuthenticated
 from tickets.models.ticket import Ticket
 from tickets.models.ticket_attachment import TicketAttachment
@@ -77,18 +77,3 @@ class TicketCommentView(generics.ListCreateAPIView):
             user=self.request.user,
             ticket_id=self.kwargs['ticket_id']
         )
-
-
-@extend_schema_view(
-    patch=extend_schema(
-        summary="Назначение сотрудника на тикет",
-    )
-)
-class TicketAssignView(generics.UpdateAPIView):
-    queryset = Ticket.objects.all()
-    serializer_class = TicketSerializer
-    permission_classes = [IsAuthenticated]
-    http_method_names = ['patch'] 
-
-    def patch(self, request, *args, **kwargs):
-        return self.patch(request, *args, **kwargs)
