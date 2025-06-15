@@ -6,6 +6,7 @@ from rest_framework.exceptions import ValidationError
 
 
 @extend_schema(
+    summary="Список всех пользователей с фильтрацией по роли",
     parameters=[
         OpenApiParameter(
             name='role',
@@ -17,6 +18,8 @@ from rest_framework.exceptions import ValidationError
     responses={
         200: UserSerializer(many=True),
         400: OpenApiResponse(description='Некорректный параметр запроса'),
+        401: OpenApiResponse(description="Пользователь не авторизован"),
+        403: OpenApiResponse(description="Нет прав для просмотра списка пользователей"),
         500: OpenApiResponse(description='Внутренняя ошибка сервера'),
     }
 )
