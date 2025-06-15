@@ -1,9 +1,6 @@
 from rest_framework import serializers
-
+from users.models import User
 from techsupport import settings
-
-
-User = settings.AUTH_USER_MODEL
 
 
 class LogoutSerializer(serializers.Serializer):
@@ -15,3 +12,9 @@ class UserCreateSerializer(serializers.ModelSerializer):
         model = User
         fields = ['id', 'email', 'name', 'password']
         extra_kwargs = {'password': {'write_only': True}}
+
+
+class UserSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = User
+        exclude = ['password']
