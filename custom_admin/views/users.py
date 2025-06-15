@@ -1,5 +1,7 @@
 from rest_framework.generics import ListAPIView
 from users.models import User
+from users.permissions import IsAdminUser
+from rest_framework.permissions import IsAuthenticated
 from users.serializers import UserSerializer
 from drf_spectacular.utils import extend_schema, OpenApiParameter, OpenApiResponse
 from rest_framework.exceptions import ValidationError
@@ -25,6 +27,7 @@ from rest_framework.exceptions import ValidationError
 )
 class UserListView(ListAPIView):
     serializer_class = UserSerializer
+    permission_classes = [IsAdminUser, IsAuthenticated]
 
     def get_queryset(self):
         role = self.request.GET.get('role')
