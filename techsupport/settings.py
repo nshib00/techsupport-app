@@ -53,7 +53,7 @@ INSTALLED_APPS = [
     'tickets.apps.TicketsConfig',
     'notifications.apps.NotificationsConfig',
     'api.apps.ApiConfig',
-    'admin.apps.AdminConfig',
+    'custom_admin.apps.CustomAdminConfig',
 ]
 
 MIDDLEWARE = [
@@ -189,10 +189,10 @@ SIMPLE_JWT = {
 }
 
 DJOSER = {
-    'LOGIN_FIELD': 'email',
+    'LOGIN_FIELD': 'username',
     'USER_CREATE_PASSWORD_RETYPE': True,
     'SERIALIZERS': {
-        'user_create': 'yourapp.serializers.UserCreateSerializer',
+        'user_create': 'users.serializers.UserCreateSerializer',
     },
     "PASSWORD_RESET_CONFIRM_URL": "password/reset/confirm/{uid}/{token}",
     "SEND_CONFIRMATION_EMAIL": False,
@@ -209,13 +209,13 @@ SPECTACULAR_SETTINGS = {
     'SCHEMA_PATH_PREFIX': '/api/v1',
 }
 
-# EMAIL_BACKEND = "django.core.mail.backends.smtp.EmailBackend"
-# EMAIL_HOST = "smtp.yourmail.com"
-# EMAIL_PORT = 587
-# EMAIL_HOST_USER = "your@email.com"
-# EMAIL_HOST_PASSWORD = "your_password"
-# EMAIL_USE_TLS = True
-# DEFAULT_FROM_EMAIL = "Your App <noreply@yourapp.com>"
+EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
+EMAIL_HOST = getenv('EMAIL_HOST')
+EMAIL_PORT = getenv('EMAIL_PORT')
+EMAIL_HOST_USER = getenv('EMAIL_USER')
+EMAIL_HOST_PASSWORD = getenv('EMAIL_PWD')
+EMAIL_USE_TLS = True
+DEFAULT_FROM_EMAIL = 'TechSupport <noreply@techsupport.com>'
 
 
 CORS_ALLOWED_ORIGINS = [

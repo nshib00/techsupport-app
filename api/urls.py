@@ -12,6 +12,7 @@ urlpatterns = [
     path('tickets/', include('tickets.urls')),
     path('users/', include('users.urls')),
     path('notifications/', include('notifications.urls')),
+    path('admin/', include('custom_admin.urls')),
 
     # Аутентификация
     path('auth/login/', LoginView.as_view(), name='login'),
