@@ -44,21 +44,6 @@ class UserTicketsRetrieveView(generics.RetrieveAPIView):
     
 
 @extend_schema_view(
-    patch=extend_schema(
-        summary="Обновление статуса тикета",
-    )
-)
-class TicketUpdateStatusView(generics.UpdateAPIView):
-    queryset = Ticket.objects.all()
-    serializer_class = TicketStatusSerializer
-    permission_classes = [IsAuthenticated]
-    http_method_names = ['patch']
-
-    def patch(self, request, *args, **kwargs):
-        return self.patch(request, *args, **kwargs)
-    
-
-@extend_schema_view(
     post=extend_schema(
         summary="Создание комментария к тикету",
     ),
