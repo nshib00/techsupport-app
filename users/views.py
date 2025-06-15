@@ -3,7 +3,6 @@ from rest_framework.permissions import IsAuthenticated
 from rest_framework import status
 from rest_framework.response import Response
 from rest_framework_simplejwt.exceptions import TokenError
-from rest_framework_simplejwt.tokens import RefreshToken
 from rest_framework_simplejwt.views import TokenObtainPairView, TokenRefreshView
 from rest_framework_simplejwt.serializers import TokenObtainPairSerializer, TokenRefreshSerializer, TokenVerifySerializer
 from rest_framework_simplejwt.token_blacklist.models import OutstandingToken, BlacklistedToken
@@ -72,6 +71,8 @@ class VerifyView(TokenObtainPairView):
     
 
 class CustomUserViewSet(DjoserUserViewSet):
+    permission_classes = [IsAuthenticated]
+
     @extend_schema(
         summary="Регистрация пользователя",
         description="Создание нового пользователя по email, имени и паролю.",
@@ -100,6 +101,7 @@ class CustomUserViewSet(DjoserUserViewSet):
         summary="Подтверждение сброса пароля",
         description="Завершает процесс восстановления пароля с помощью uid и token.",
         responses={204: None}
+        # параметры: uid, token, new_password
     )
     def reset_password_confirm(self, request, *args, **kwargs):
         return super().reset_password_confirm(request, *args, **kwargs)
