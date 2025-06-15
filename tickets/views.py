@@ -3,7 +3,8 @@ from rest_framework.permissions import IsAuthenticated
 from tickets.models.ticket import Ticket
 from tickets.models.ticket_attachment import TicketAttachment
 from tickets.models.ticket_comment import TicketComment
-from tickets.serializers import TicketCommentSerializer, TicketListRetrieveSerializer, TicketSerializer, TicketStatusSerializer
+from tickets.serializers.tickets import TicketListRetrieveSerializer, TicketSerializer, TicketStatusSerializer
+from tickets.serializers.ticket_comments import TicketCommentSerializer
 from drf_spectacular.utils import extend_schema_view, extend_schema
 
 
