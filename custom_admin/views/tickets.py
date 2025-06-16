@@ -1,35 +1,37 @@
+from django.shortcuts import get_object_or_404
 from rest_framework.generics import UpdateAPIView
 from rest_framework.mixins import RetrieveModelMixin, ListModelMixin
 from rest_framework.viewsets import GenericViewSet
-from rest_framework.exceptions import NotFound
+from rest_framework.exceptions import NotFound, ValidationError, PermissionDenied
 from rest_framework.response import Response
 from rest_framework.permissions import IsAuthenticated
 from django.http import Http404
+from users.models import User
 from users.permissions import IsAdminUser
 from tickets.models.ticket import Ticket
-from tickets.serializers.tickets import TicketSerializer, TicketStatusSerializer
+from tickets.serializers.tickets import TicketAssignSerializer, TicketSerializer, TicketStatusSerializer
 from drf_spectacular.utils import extend_schema, extend_schema_view, OpenApiParameter, OpenApiResponse
+
 
 @extend_schema_view(
     patch=extend_schema(
         summary="Назначение сотрудника на тикет",
+        description="Позволяет назначить сотрудника поддержки на тикет по его ID.",
+        request=TicketAssignSerializer,
         responses={
-            200: TicketSerializer,
-            400: OpenApiResponse(description="Неверные данные"),
-            401: OpenApiResponse(description="Пользователь не авторизован"),
-            403: OpenApiResponse(description="Нет прав для изменения тикета"),
-            404: OpenApiResponse(description="Тикет не найден"),
+            200: OpenApiResponse(response=TicketAssignSerializer, description="Сотрудник успешно назначен"),
+            400: OpenApiResponse(description="Ошибка валидации"),
+            401: OpenApiResponse(description="Неавторизованный пользователь"),
+            403: OpenApiResponse(description="Доступ запрещён"),
+            404: OpenApiResponse(description="Тикет или пользователь не найден"),
         }
     )
 )
 class TicketAssignView(UpdateAPIView):
     queryset = Ticket.objects.all()
-    serializer_class = TicketSerializer
+    serializer_class = TicketAssignSerializer
     permission_classes = [IsAdminUser, IsAuthenticated]
-    http_method_names = ['patch'] 
-
-    def patch(self, request, *args, **kwargs):
-        return self.patch(request, *args, **kwargs)
+    http_method_names = ['patch']
     
 
 @extend_schema_view(
@@ -49,6 +51,7 @@ class TicketUpdateStatusView(UpdateAPIView):
     serializer_class = TicketStatusSerializer
     permission_classes = [IsAdminUser, IsAuthenticated]
     http_method_names = ['patch']
+    
 
     def patch(self, request, *args, **kwargs):
         return self.patch(request, *args, **kwargs)
