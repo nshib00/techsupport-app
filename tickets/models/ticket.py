@@ -4,18 +4,17 @@ from tickets.models.ticket_category import TicketCategory
 
 
 class Ticket(models.Model):
-    STATUS_CHOICES = [
-        ('open', 'Открыта'),
-        ('in_progress', 'В работе'),
-        ('resolved', 'Решена'),
-        ('closed', 'Закрыта'),
-    ]
-    PRIORITY_CHOICES = [
-        ('low', 'Низкий'),
-        ('medium', 'Средний'),
-        ('high', 'Высокий'),
-        ('critical', 'Критический'),
-    ]
+    class Status(models.TextChoices):
+        OPEN = 'open', 'Открыта'
+        IN_PROGRESS = 'in_progress', 'В работе'
+        RESOLVED = 'resolved', 'Решена'
+        CLOSED = 'closed', 'Закрыта'
+
+    class Priority(models.TextChoices):
+        LOW = 'low', 'Низкий'
+        MEDIUM = 'medium', 'Средний'
+        HIGH = 'high', 'Высокий'
+        CRITICAL = 'critical', 'Критический'
 
     user = models.ForeignKey(
         settings.AUTH_USER_MODEL, 
@@ -34,13 +33,13 @@ class Ticket(models.Model):
     description = models.TextField(verbose_name='Описание')
     status = models.CharField(
         max_length=20, 
-        choices=STATUS_CHOICES, 
+        choices=Status.choices, 
         default='open',
         verbose_name='Статус'
     )
     priority = models.CharField(
         max_length=20, 
-        choices=PRIORITY_CHOICES, 
+        choices=Priority.choices, 
         default='medium',
         verbose_name='Приоритет'
     )
