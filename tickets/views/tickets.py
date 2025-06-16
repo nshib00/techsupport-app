@@ -1,7 +1,7 @@
 from rest_framework import generics, serializers
 from rest_framework.permissions import IsAuthenticated
 from tickets.models.ticket import Ticket
-from rest_framework.exceptions import NotFound
+from rest_framework.exceptions import NotFound, ValidationError
 from tickets.models.ticket_attachment import TicketAttachment
 from tickets.serializers.tickets import TicketListRetrieveSerializer, TicketSerializer
 from drf_spectacular.utils import extend_schema_view, extend_schema, inline_serializer, OpenApiResponse, OpenApiParameter
@@ -11,6 +11,15 @@ from drf_spectacular.utils import extend_schema_view, extend_schema, inline_seri
     get=extend_schema(
         summary="Список тикетов, созданных пользователем",
         description= "Возвращает список всех тикетов, созданных текущим пользователем.",
+        parameters=[
+            OpenApiParameter(
+                name="status",
+                description="Фильтр тикетов по статусу",
+                required=False,
+                type=str,
+                location=OpenApiParameter.QUERY,
+            ),
+        ],
         responses={
             200: TicketSerializer(many=True),
             401: OpenApiResponse(description="Пользователь не авторизован")
@@ -51,7 +60,16 @@ class TicketListCreateView(generics.ListCreateAPIView):
     permission_classes = [IsAuthenticated]
 
     def get_queryset(self):
-        return Ticket.objects.filter(user=self.request.user)
+        queryset = Ticket.objects.filter(user=self.request.user)
+        status = self.request.GET.get('status')
+        if status is not None:
+            valid_status_names = [st[0] for st in Ticket.Status.choices]
+            if status not in valid_status_names:
+                raise ValidationError(
+                    {'status': f'Недопустимое значение. Возможные значения: {", ".join(valid_status_names)}'}
+                )
+            return queryset.filter(status=status)
+        return queryset
 
     def perform_create(self, serializer):
         attachments = self.request.FILES.getlist('attachments')
