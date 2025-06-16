@@ -32,7 +32,7 @@ class UserListView(ListAPIView):
     def get_queryset(self):
         role = self.request.GET.get('role')
         if role is not None:
-            valid_roles = [choice[0] for choice in User.ROLE_CHOICES]
+            valid_roles = [choice[0] for choice in User.Role.choices]
             if role not in valid_roles:
                 raise ValidationError({'role': f'Недопустимое значение. Возможные значения: {", ".join(valid_roles)}'})
             return User.objects.filter(role=role)
