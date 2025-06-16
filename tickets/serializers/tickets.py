@@ -9,8 +9,8 @@ class TicketSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Ticket
-        fields = ['id', 'subject', 'description', 'category', 'assigned_to', 'created_at', 'attachments']
-        read_only_fields = ['assigned_to', 'attachments']
+        fields = ['id', 'subject', 'description', 'category', 'assigned_to', 'status', 'attachments']
+        read_only_fields = ['assigned_to', 'status', 'attachments']
 
 
 class TicketListRetrieveSerializer(serializers.ModelSerializer):

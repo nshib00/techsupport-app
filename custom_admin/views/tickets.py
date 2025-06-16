@@ -1,12 +1,10 @@
-from django.shortcuts import get_object_or_404
 from rest_framework.generics import UpdateAPIView
 from rest_framework.mixins import RetrieveModelMixin, ListModelMixin
 from rest_framework.viewsets import GenericViewSet
-from rest_framework.exceptions import NotFound, ValidationError, PermissionDenied
+from rest_framework.exceptions import NotFound
 from rest_framework.response import Response
 from rest_framework.permissions import IsAuthenticated
 from django.http import Http404
-from users.models import User
 from users.permissions import IsAdminUser
 from tickets.models.ticket import Ticket
 from tickets.serializers.tickets import TicketAssignSerializer, TicketSerializer, TicketStatusSerializer
@@ -42,7 +40,7 @@ class TicketAssignView(UpdateAPIView):
             400: OpenApiResponse(description="Неверные данные"),
             401: OpenApiResponse(description="Пользователь не авторизован"),
             403: OpenApiResponse(description="Нет прав для изменения тикета"),
-            404: OpenApiResponse(description="Тикет не найден"),
+            404: OpenApiResponse(description="Тикет не найден или передан несуществующий статус"),
         }
     )
 )
@@ -53,17 +51,13 @@ class TicketUpdateStatusView(UpdateAPIView):
     http_method_names = ['patch']
     
 
-    def patch(self, request, *args, **kwargs):
-        return self.patch(request, *args, **kwargs)
-    
-
 @extend_schema_view(
     list=extend_schema(
         summary="Получение списка тикетов",
         parameters=[
             OpenApiParameter(
                 name='status',
-                description='Фильтрация по статусу тикета (например: open, closed)',
+                description='Фильтрация по статусу тикета (open, in_progress, resolved, closed)',
                 required=False,
                 type=str
             ),
