@@ -1,13 +1,12 @@
 from django.db import models
-from django.utils.text import slugify
 from techsupport import settings
 from tickets.models.ticket import Ticket
 from os.path import basename
 
 
 def ticket_attachment_path(instance, filename):
-    safe_name = slugify(basename(filename))
-    return f'tickets/{instance.ticket.id}/attachments/{safe_name}'
+    safe_name = basename(filename)
+    return f'ticket-attachments/{instance.ticket.id}/{safe_name}'
 
 
 class TicketAttachment(models.Model):
