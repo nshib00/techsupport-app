@@ -1,7 +1,6 @@
 from django.urls import path
-from tickets.views import (
-    TicketCommentView, TicketListCreateView, UserTicketsRetrieveView
-)
+from tickets.views.ticket_comments import TicketCommentView
+from tickets.views.tickets import TicketListCreateView, UserTicketsRetrieveView
 
 
 urlpatterns = [
