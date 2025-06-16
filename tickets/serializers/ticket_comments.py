@@ -6,3 +6,4 @@ class TicketCommentSerializer(ModelSerializer):
     class Meta:
         model = TicketComment
         fields = ['id', 'message', 'is_internal', 'created_at']
+        read_only_fields = ['created_at']
