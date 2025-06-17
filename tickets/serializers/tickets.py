@@ -9,8 +9,17 @@ class TicketSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Ticket
-        fields = ['id', 'subject', 'description', 'category', 'assigned_to', 'status', 'attachments']
+        fields = ['id', 'subject', 'description', 'category', 'status', 'attachments']
         read_only_fields = ['assigned_to', 'status', 'attachments']
+
+
+class TicketListAdminSerializer(TicketSerializer):
+    class Meta:
+        model = Ticket
+        fields = '__all__'
+        read_only_fields = [
+            'assigned_to', 'status', 'attachments', 'created_at', 'updated_at', 'closed_at', 'closed_by'
+        ]
 
 
 class TicketListRetrieveSerializer(serializers.ModelSerializer):
