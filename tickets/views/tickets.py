@@ -46,14 +46,15 @@ from drf_spectacular.utils import extend_schema_view, extend_schema, inline_seri
                     'attachments': serializers.ListField(
                         child=serializers.FileField(),
                         required=False,
-                        help_text="Файлы вложений (можно загрузить несколько)"
+                        help_text="Файлы вложений (можно загрузить до 10)",
+                        max_length=10
                     ),
                 }
             )
         },
         responses={
             201: TicketSerializer,
-            400: OpenApiResponse(description="Неверные данные"),
+            400: OpenApiResponse(description="Неверные данные или ошибка валидации"),
             401: OpenApiResponse(description="Пользователь не авторизован")
         }
     )
@@ -76,6 +77,10 @@ class TicketListCreateView(generics.ListCreateAPIView):
 
     def perform_create(self, serializer):
         attachments = self.request.FILES.getlist('attachments')
+        if len(attachments) > 10:
+            raise ValidationError(
+                {'attachments': 'Нельзя загружать больше 10 вложений к обращению.'}
+            )
         for file in attachments:
             attachment_serializer = TicketAttachmentSerializer(data={'file': file})
             attachment_serializer.is_valid(raise_exception=True)
