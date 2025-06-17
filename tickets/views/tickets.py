@@ -3,6 +3,8 @@ from rest_framework.permissions import IsAuthenticated
 from tickets.models.ticket import Ticket
 from rest_framework.exceptions import NotFound, ValidationError
 from tickets.models.ticket_attachment import TicketAttachment
+from tickets.serializers.ticket_attachments import TicketAttachmentSerializer
+from tickets.serializers.consts import ALLOWED_EXTENSIONS
 from tickets.serializers.tickets import TicketListRetrieveSerializer, TicketSerializer
 from drf_spectacular.utils import extend_schema_view, extend_schema, inline_serializer, OpenApiResponse, OpenApiParameter
 
@@ -30,7 +32,8 @@ from drf_spectacular.utils import extend_schema_view, extend_schema, inline_seri
         description=(
             "Позволяет создать новый тикет в службу технической поддержки. "
             "Поля `subject`, `category` и `description` обязательны.\n\n"
-            "Можно прикрепить один или несколько файлов как вложения. "
+            "Через поле `attachments` можно прикрепить один или несколько файлов как вложения.\n\n"
+            f"Доступные форматы файлов: {', '.join(ALLOWED_EXTENSIONS)}. "
             "Файлы отправляются в формате multipart/form-data."
         ),
         request={
@@ -73,6 +76,9 @@ class TicketListCreateView(generics.ListCreateAPIView):
 
     def perform_create(self, serializer):
         attachments = self.request.FILES.getlist('attachments')
+        for file in attachments:
+            attachment_serializer = TicketAttachmentSerializer(data={'file': file})
+            attachment_serializer.is_valid(raise_exception=True)
         ticket = serializer.save(user=self.request.user)
         for file in attachments:
             TicketAttachment.objects.create(ticket=ticket, user=self.request.user, file=file)
