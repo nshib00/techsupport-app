@@ -1,12 +1,14 @@
 from django.db import models
 from techsupport import settings
 from tickets.models.ticket import Ticket
-from os.path import basename
+from uuid import uuid4
+from os.path import splitext
 
 
 def ticket_attachment_path(instance, filename):
-    safe_name = basename(filename)
-    return f'ticket-attachments/{instance.ticket.id}/{safe_name}'
+    file_extension = splitext(filename)[1].lower() # расширение файла
+    unique_filename = f"{uuid4().hex}{file_extension}" # уникальное имя файла с использованием UUID и расширения
+    return f'ticket-attachments/{instance.ticket.id}/{unique_filename}'
 
 
 class TicketAttachment(models.Model):
