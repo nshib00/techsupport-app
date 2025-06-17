@@ -32,6 +32,7 @@ DEBUG = True
 
 ALLOWED_HOSTS = ["*"]
 
+SITE_NAME = "TechSupport"
 
 # Application definition
 
@@ -72,7 +73,7 @@ ROOT_URLCONF = 'techsupport.urls'
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
-        'DIRS': [],
+        'DIRS': [BASE_DIR / 'templates'],
         'APP_DIRS': True,
         'OPTIONS': {
             'context_processors': [
@@ -229,6 +230,13 @@ CORS_ALLOWED_ORIGINS = [
     "http://127.0.0.1:8000",
     "http://localhost:8000",
 ]
+
+
+CELERY_BROKER_URL = 'redis://localhost:6379/0'
+CELERY_ACCEPT_CONTENT = ['json']
+CELERY_TASK_SERIALIZER = 'json'
+CELERY_TIMEZONE = 'Europe/Moscow'
+CELERY_ENABLE_UTC = True
 
 
 # LOGGING = {
