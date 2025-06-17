@@ -7,8 +7,9 @@ from rest_framework.permissions import IsAuthenticated
 from django.http import Http404
 from users.permissions import IsAdminUser
 from tickets.models.ticket import Ticket
-from tickets.serializers.tickets import TicketAssignSerializer, TicketSerializer, TicketStatusSerializer
+from tickets.serializers.tickets import TicketAssignSerializer, TicketListAdminSerializer, TicketSerializer, TicketStatusSerializer
 from drf_spectacular.utils import extend_schema, extend_schema_view, OpenApiParameter, OpenApiResponse
+from notifications.tasks import send_status_change_notification_email
 
 
 @extend_schema_view(
@@ -49,6 +50,16 @@ class TicketUpdateStatusView(UpdateAPIView):
     serializer_class = TicketStatusSerializer
     permission_classes = [IsAdminUser, IsAuthenticated]
     http_method_names = ['patch']
+
+    def perform_update(self, serializer):
+        old_status = self.get_object().status
+        instance = serializer.save()
+        
+        send_status_change_notification_email.delay( # вызываем асинхронную задачу для отправки уведомления
+            ticket_id=instance.id,
+            old_status=old_status,
+            new_status=instance.status
+        )
     
 
 @extend_schema_view(
@@ -91,7 +102,7 @@ class TicketUpdateStatusView(UpdateAPIView):
     )
 )
 class TicketListRetrieveView(RetrieveModelMixin, ListModelMixin, GenericViewSet):
-    serializer_class = TicketSerializer
+    serializer_class = TicketListAdminSerializer
     permission_classes = [IsAdminUser, IsAuthenticated]
 
     def get_queryset(self):
