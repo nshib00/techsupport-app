@@ -1,7 +1,7 @@
 from django.urls import include, path
-from custom_admin.views.tickets import TicketAssignView, TicketListRetrieveView, TicketUpdateStatusView
-from custom_admin.views.ticket_categories import TicketCategoryCreateView
-from custom_admin.views.users import UserListView
+from custom_admin.views.support.tickets import TicketAssignView, TicketListRetrieveView, TicketUpdateStatusView
+from custom_admin.views.admin.ticket_categories import TicketCategoryCreateView
+from custom_admin.views.admin.users import UserListView, UserUpdateRoleView
 
 
 admin_urlpatterns = [
@@ -10,7 +10,7 @@ admin_urlpatterns = [
 
     # Пользователи
     path('users/', UserListView.as_view(), name='users-list'),
-    # path('users/<int:pk>/role/', UserUpdateRoleView.as_view(), name='change-user-role'),
+    path('users/<int:pk>/role/', UserUpdateRoleView.as_view(), name='change-user-role'),
 ]
 
 support_urlpatterns = [

@@ -1,8 +1,8 @@
-from rest_framework.generics import ListAPIView
+from rest_framework.generics import ListAPIView, UpdateAPIView
 from users.models import User
 from users.permissions import IsAdminUser
 from rest_framework.permissions import IsAuthenticated
-from users.serializers import UserSerializer
+from users.serializers import UserSerializer, UserRoleUpdateSerializer
 from drf_spectacular.utils import extend_schema, OpenApiParameter, OpenApiResponse
 from rest_framework.exceptions import ValidationError
 
@@ -37,3 +37,27 @@ class UserListView(ListAPIView):
                 raise ValidationError({'role': f'Недопустимое значение. Возможные значения: {", ".join(valid_roles)}'})
             return User.objects.filter(role=role)
         return User.objects.all()
+    
+
+@extend_schema(
+    summary="Изменение роли пользователя",
+    description=(
+        'Позволяет изменить роль пользователя с заданным ID, кроме себя.\n\n'
+        'Доступные значения: user, support.\n\n'
+        'Метод доступен **только для администраторов**.'
+    ),
+    responses={
+        200: UserSerializer(many=True),
+        400: OpenApiResponse(description='Некорректная роль пользователя'),
+        401: OpenApiResponse(description="Пользователь не авторизован"),
+        403: OpenApiResponse(description="Нет прав для изменения роли пользователя"),
+        404: OpenApiResponse(description="Пользователь с указанным ID не найден"),
+    }
+)
+class UserUpdateRoleView(UpdateAPIView):
+    queryset = User.objects.all()
+    serializer_class = UserRoleUpdateSerializer
+    permission_classes = [IsAdminUser, IsAuthenticated]
+    http_method_names = ['patch']
+
+
