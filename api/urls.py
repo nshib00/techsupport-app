@@ -12,7 +12,7 @@ urlpatterns = [
     path('tickets/', include('tickets.urls')),
     path('users/', include('users.urls')),
     path('notifications/', include('notifications.urls')),
-    path('admin/', include('custom_admin.urls')),
+    path('', include('custom_admin.urls')), # префиксы admin/ и support/ уже добавлены в api/urls.py 
 
     # Аутентификация
     path('auth/login/', LoginView.as_view(), name='login'),

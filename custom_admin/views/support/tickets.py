@@ -5,9 +5,11 @@ from rest_framework.exceptions import NotFound
 from rest_framework.response import Response
 from rest_framework.permissions import IsAuthenticated
 from django.http import Http404
-from users.permissions import IsAdminUser
+from users.permissions import IsSupportUser
 from tickets.models.ticket import Ticket
-from tickets.serializers.tickets import TicketAssignSerializer, TicketListAdminSerializer, TicketSerializer, TicketStatusSerializer
+from tickets.serializers.tickets import (
+    TicketAssignSerializer, TicketListAdminSerializer, TicketSerializer, TicketStatusSerializer
+)
 from drf_spectacular.utils import extend_schema, extend_schema_view, OpenApiParameter, OpenApiResponse
 from notifications.tasks import send_status_change_notification_email
 
@@ -29,7 +31,7 @@ from notifications.tasks import send_status_change_notification_email
 class TicketAssignView(UpdateAPIView):
     queryset = Ticket.objects.all()
     serializer_class = TicketAssignSerializer
-    permission_classes = [IsAdminUser, IsAuthenticated]
+    permission_classes = [IsSupportUser, IsAuthenticated]
     http_method_names = ['patch']
     
 
@@ -48,14 +50,14 @@ class TicketAssignView(UpdateAPIView):
 class TicketUpdateStatusView(UpdateAPIView):
     queryset = Ticket.objects.all()
     serializer_class = TicketStatusSerializer
-    permission_classes = [IsAdminUser, IsAuthenticated]
+    permission_classes = [IsSupportUser, IsAuthenticated]
     http_method_names = ['patch']
 
     def perform_update(self, serializer):
         old_status = self.get_object().status
         instance = serializer.save()
         
-        send_status_change_notification_email.delay( # вызываем асинхронную задачу для отправки уведомления
+        send_status_change_notification_email.delay( # вызываем асинхронную задачу Celery для отправки уведомления
             ticket_id=instance.id,
             old_status=old_status,
             new_status=instance.status
@@ -103,7 +105,7 @@ class TicketUpdateStatusView(UpdateAPIView):
 )
 class TicketListRetrieveView(RetrieveModelMixin, ListModelMixin, GenericViewSet):
     serializer_class = TicketListAdminSerializer
-    permission_classes = [IsAdminUser, IsAuthenticated]
+    permission_classes = [IsSupportUser, IsAuthenticated]
 
     def get_queryset(self):
         filters = {
