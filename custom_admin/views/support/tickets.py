@@ -1,10 +1,11 @@
 from rest_framework.generics import UpdateAPIView
 from rest_framework.mixins import RetrieveModelMixin, ListModelMixin
 from rest_framework.viewsets import GenericViewSet
-from rest_framework.exceptions import NotFound
+from rest_framework.exceptions import NotFound, ValidationError
 from rest_framework.response import Response
 from rest_framework.permissions import IsAuthenticated
 from django.http import Http404
+from datetime import datetime
 from users.permissions import IsSupportUser
 from tickets.models.ticket import Ticket
 from tickets.serializers.tickets import (
@@ -54,8 +55,20 @@ class TicketUpdateStatusView(UpdateAPIView):
     http_method_names = ['patch']
 
     def perform_update(self, serializer):
-        old_status = self.get_object().status
+        ticket = self.get_object()
+        old_status = ticket.status
+
+        if ticket.assigned_to is None:
+            raise ValidationError(
+                {'assigned_to': 'Нельзя изменить статус, пока не назначен ответственный сотрудник.'}
+            )
+
         instance = serializer.save()
+
+        if instance.status == Ticket.Status.CLOSED:
+            instance.closed_at = datetime.now()
+            instance.closed_by = self.request.user
+            instance.save(update_fields=['closed_at', 'closed_by'])
         
         send_status_change_notification_email.delay( # вызываем асинхронную задачу Celery для отправки уведомления
             ticket_id=instance.id,
