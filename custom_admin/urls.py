@@ -1,4 +1,5 @@
 from django.urls import include, path
+from custom_admin.views.admin.ticket_history import TicketHistoryView
 from custom_admin.views.support.tickets import TicketAssignView, TicketListRetrieveView, TicketUpdateStatusView
 from custom_admin.views.admin.ticket_categories import TicketCategoryViewSet
 from custom_admin.views.admin.users import UserListView, UserUpdateRoleView
@@ -12,6 +13,9 @@ admin_urlpatterns = [
     # Пользователи
     path('users/', UserListView.as_view(), name='users-list'),
     path('users/<int:pk>/role/', UserUpdateRoleView.as_view(), name='change-user-role'),
+
+    # История изменения тикетов
+    path('tickets/history/', TicketHistoryView.as_view(), name='ticket-history'),
 ]
 admin_urlpatterns += router.urls # Категории тикетов
 
