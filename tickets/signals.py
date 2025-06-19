@@ -1,4 +1,3 @@
-from datetime import datetime
 from django.db.models.signals import post_save
 from django.dispatch import receiver
 from .models import Ticket
@@ -10,6 +9,8 @@ from channels.layers import get_channel_layer
 def notify_support_on_new_ticket(sender, instance, created, **kwargs):
     if created:
         channel_layer = get_channel_layer()
+        if channel_layer is None:
+            raise RuntimeError("Channel layer is not configured.")
         async_to_sync(channel_layer.group_send)(
             "support",
             {

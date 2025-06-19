@@ -1,6 +1,7 @@
 import json
 from channels.generic.websocket import AsyncJsonWebsocketConsumer
 from channels.db import database_sync_to_async
+from channels.layers import BaseChannelLayer
 from users.models import User
 
 

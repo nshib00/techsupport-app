@@ -22,7 +22,7 @@ dependencies = [
     "channels-redis (>=4.2.1,<5.0.0)",
     "gunicorn (>=23.0.0,<24.0.0)",
     "uvicorn[standard] (>=0.34.3,<0.35.0)",
-    "websockets (>=15.0.1,<16.0.0)"
+    "websockets (>=15.0.1,<16.0.0)",
 ]
 
 
