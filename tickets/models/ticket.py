@@ -10,12 +10,6 @@ class Ticket(models.Model):
         RESOLVED = 'resolved', 'Решена'
         CLOSED = 'closed', 'Закрыта'
 
-    class Priority(models.TextChoices):
-        LOW = 'low', 'Низкий'
-        MEDIUM = 'medium', 'Средний'
-        HIGH = 'high', 'Высокий'
-        CRITICAL = 'critical', 'Критический'
-
     user = models.ForeignKey(
         settings.AUTH_USER_MODEL, 
         on_delete=models.CASCADE, 
@@ -36,12 +30,6 @@ class Ticket(models.Model):
         choices=Status.choices, 
         default='open',
         verbose_name='Статус'
-    )
-    priority = models.CharField(
-        max_length=20, 
-        choices=Priority.choices, 
-        default='medium',
-        verbose_name='Приоритет'
     )
     assigned_to = models.ForeignKey(
         settings.AUTH_USER_MODEL, 
@@ -69,7 +57,6 @@ class Ticket(models.Model):
         ordering = ['-created_at']
         indexes = [
             models.Index(fields=['status']),
-            models.Index(fields=['priority']),
             models.Index(fields=['user']),
             models.Index(fields=['assigned_to']),
         ]
