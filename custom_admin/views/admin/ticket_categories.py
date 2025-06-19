@@ -1,17 +1,18 @@
 from tickets.models.ticket_category import TicketCategory
 from tickets.serializers.ticket_category import TicketCategorySerializer
-from rest_framework.generics import CreateAPIView
+from rest_framework.viewsets import ModelViewSet
 from rest_framework.permissions import IsAuthenticated
-from rest_framework.response import Response
 from techsupport.exceptions import ConflictAPIException
-from rest_framework import status
 from users.permissions import IsAdminUser
 from drf_spectacular.utils import extend_schema, extend_schema_view, OpenApiResponse
 
 
+from drf_spectacular.utils import OpenApiParameter
+
 @extend_schema_view(
-    post=extend_schema(
+    create=extend_schema(
         summary="Создание категории тикетов",
+        request=TicketCategorySerializer,
         responses={
             201: TicketCategorySerializer,
             400: OpenApiResponse(description="Некорректные данные для создания категории"),
@@ -20,28 +21,65 @@ from drf_spectacular.utils import extend_schema, extend_schema_view, OpenApiResp
             409: OpenApiResponse(description="Категория с заданным названием уже существует"),
         }
     ),
+    partial_update=extend_schema(
+        summary="Обновление категории тикетов",
+        request=TicketCategorySerializer,
+        parameters=[
+            OpenApiParameter(
+                name='id',
+                type=int,
+                location=OpenApiParameter.PATH,
+                description='ID категории, которую необходимо обновить'
+            )
+        ],
+        responses={
+            200: TicketCategorySerializer,
+            400: OpenApiResponse(description="Некорректные данные"),
+            401: OpenApiResponse(description="Пользователь не авторизован"),
+            403: OpenApiResponse(description="Нет прав для обновления категорий"),
+            404: OpenApiResponse(description="Категория не найдена"),
+            409: OpenApiResponse(description="Категория с таким названием уже существует"),
+        },
+    ),
+    destroy=extend_schema(
+        summary="Удаление категории тикетов",
+        parameters=[
+            OpenApiParameter(
+                name='id',
+                type=int,
+                location=OpenApiParameter.PATH,
+                description='ID категории, которую необходимо удалить'
+            )
+        ],
+        responses={
+            204: OpenApiResponse(description="Категория удалена"),
+            401: OpenApiResponse(description="Пользователь не авторизован"),
+            403: OpenApiResponse(description="Нет прав на удаление категории"),
+            404: OpenApiResponse(description="Категория не найдена"),
+        },
+    ),
 )
-class TicketCategoryCreateView(CreateAPIView):
+class TicketCategoryViewSet(ModelViewSet):
     serializer_class = TicketCategorySerializer
     queryset = TicketCategory.objects.all()
     permission_classes = [IsAdminUser, IsAuthenticated]
+    http_method_names = ['post', 'patch', 'delete']
 
-    def create(self, request, *args, **kwargs):
-        serializer = self.get_serializer(data=request.data)
-
-        name = serializer.initial_data.get('name')
+    def post(self, request, *args, **kwargs):
+        name = request.data.get('name')
         category_with_name = TicketCategory.objects.filter(name__iexact=name)
         if category_with_name.exists():
             raise ConflictAPIException(
                 {"name": "Категория с таким названием уже существует"},
             )
-
-        serializer.is_valid(raise_exception=True)
-        self.perform_create(serializer)
-        headers = self.get_success_headers(serializer.data)
-        
-        return Response(
-            serializer.data,
-            status=status.HTTP_201_CREATED,
-            headers=headers
-        )
+        return super().create(request, *args, **kwargs)
+    
+    def partial_update(self, request, *args, **kwargs):
+        category = self.get_object()
+        new_name = request.data.get('name')
+        category_with_new_name_exists: bool = TicketCategory.objects.exclude(
+            pk=category.pk
+        ).filter(name__iexact=new_name).exists()
+        if new_name and category_with_new_name_exists:
+            raise ConflictAPIException({"name": "Категория с таким названием уже существует"})
+        return super().partial_update(request, *args, **kwargs)

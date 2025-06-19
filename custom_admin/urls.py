@@ -1,17 +1,19 @@
 from django.urls import include, path
 from custom_admin.views.support.tickets import TicketAssignView, TicketListRetrieveView, TicketUpdateStatusView
-from custom_admin.views.admin.ticket_categories import TicketCategoryCreateView
+from custom_admin.views.admin.ticket_categories import TicketCategoryViewSet
 from custom_admin.views.admin.users import UserListView, UserUpdateRoleView
+from rest_framework.routers import SimpleRouter
 
+
+router = SimpleRouter()
+router.register('categories', TicketCategoryViewSet, basename='ticket-category') 
 
 admin_urlpatterns = [
-    # Категории тикетов
-    path('tickets/categories/', TicketCategoryCreateView.as_view(), name='ticket-categories'),
-
     # Пользователи
     path('users/', UserListView.as_view(), name='users-list'),
     path('users/<int:pk>/role/', UserUpdateRoleView.as_view(), name='change-user-role'),
 ]
+admin_urlpatterns += router.urls # Категории тикетов
 
 support_urlpatterns = [
     # Тикеты
