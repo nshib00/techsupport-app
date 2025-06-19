@@ -6,6 +6,8 @@ from users.models import User
 
 
 class SupportNotificationConsumer(AsyncJsonWebsocketConsumer):
+    channel_layer: BaseChannelLayer # аннотация типа, чтобы IDE (например, VS Code) распознавала методы group_add/group_discard
+
     async def connect(self):
         user = self.scope['user']
         if user.is_authenticated and await self.is_support(user):
