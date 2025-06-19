@@ -49,6 +49,7 @@ INSTALLED_APPS = [
     'djoser',
     'drf_spectacular',
     'corsheaders',
+    'channels',
     # apps
     'users.apps.UsersConfig',
     'tickets.apps.TicketsConfig',
@@ -87,6 +88,7 @@ TEMPLATES = [
 ]
 
 WSGI_APPLICATION = 'techsupport.wsgi.application'
+ASGI_APPLICATION = 'techsupport.asgi.application'
 
 
 # Database
@@ -237,6 +239,16 @@ CELERY_ACCEPT_CONTENT = ['json']
 CELERY_TASK_SERIALIZER = 'json'
 CELERY_TIMEZONE = 'Europe/Moscow'
 CELERY_ENABLE_UTC = True
+
+# настройка Django Channels
+CHANNEL_LAYERS = {
+    'default': {
+        'BACKEND': 'channels_redis.core.RedisChannelLayer',
+        'CONFIG': {
+            'hosts': [('localhost', 6379)],
+        },
+    },
+}
 
 
 # LOGGING = {
