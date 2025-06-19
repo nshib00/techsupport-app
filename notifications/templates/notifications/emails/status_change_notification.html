@@ -5,10 +5,10 @@
 </head>
 <body>
     <h2>Уважаемый {{ username }}!</h2>
-    <p>Статус вашей заявки #{{ ticket.id }} был изменён:</p>
+    <p>Статус вашей заявки #{{ ticket_id }} был изменён:</p>
     
     <div style="background: #f5f5f5; padding: 10px; margin: 10px 0;">
-        <p><strong>Тема:</strong> {{ ticket.subject }}</p>
+        <p><strong>Тема:</strong> {{ ticket_subject }}</p>
         <p><strong>Старый статус:</strong> {{ old_status }}</p>
         <p><strong>Новый статус:</strong> {{ new_status }}</p>
     </div>

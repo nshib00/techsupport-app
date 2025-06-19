@@ -1,8 +1,8 @@
 Уважаемый {{ username }}!
 
-Статус вашей заявки #{{ ticket.id }} был изменён:
+Статус вашей заявки #{{ ticket_id }} был изменён:
 
-Тема: {{ ticket.subject }}
+Тема: {{ ticket_subject }}
 Старый статус: {{ old_status }}
 Новый статус: {{ new_status }}
 

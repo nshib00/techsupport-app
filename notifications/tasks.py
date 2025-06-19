@@ -2,6 +2,7 @@ from celery import shared_task
 from django.core.mail import send_mail
 from django.template.loader import render_to_string
 from techsupport import settings
+from techsupport.common.utils import sanitize_html
 from .models import Ticket, Notification
 
 
@@ -13,11 +14,12 @@ def send_status_change_notification_email(ticket_id, old_status, new_status):
         
         subject = f"Изменение статуса вашей заявки #{ticket.pk}"
         context = {
-            'ticket': ticket,
+            'ticket_id': ticket.pk,
+            'ticket_subject': sanitize_html(ticket.subject),
             'old_status': ticket.Status(old_status).label,
             'new_status': ticket.Status(new_status).label,
-            'username': user.first_name or user.username,
-            'site_name': settings.SITE_NAME,
+            'username': sanitize_html(user.first_name or user.username),
+            'site_name': sanitize_html(settings.SITE_NAME),
         }
         
         text_message = render_to_string('notifications/emails/status_change_notification.txt', context)
