@@ -1,9 +1,9 @@
-from rest_framework.serializers import ModelSerializer
 from rest_framework.exceptions import ValidationError
+from techsupport.common.serializers import BaseModelSerializer
 from tickets.models.ticket_category import TicketCategory
 
 
-class TicketCategorySerializer(ModelSerializer):
+class TicketCategorySerializer(BaseModelSerializer):
     class Meta:
         model = TicketCategory
         fields = ['id', 'name', 'description']  

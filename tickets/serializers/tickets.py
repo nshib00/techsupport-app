@@ -1,11 +1,12 @@
 from rest_framework import serializers
+from techsupport.common.serializers import BaseModelSerializer
 from tickets.models.ticket import Ticket
 from tickets.serializers.ticket_attachments import TicketAttachmentSerializer
 from users.models import User
 from datetime import datetime
 
 
-class TicketSerializer(serializers.ModelSerializer):
+class TicketSerializer(BaseModelSerializer):
     attachments = TicketAttachmentSerializer(many=True, read_only=True)
 
     class Meta:
@@ -14,7 +15,7 @@ class TicketSerializer(serializers.ModelSerializer):
         read_only_fields = ['assigned_to', 'status', 'attachments']
 
 
-class TicketListAdminSerializer(TicketSerializer):
+class TicketListAdminSerializer(BaseModelSerializer):
     class Meta:
         model = Ticket
         fields = '__all__'
@@ -23,13 +24,13 @@ class TicketListAdminSerializer(TicketSerializer):
         ]
 
 
-class TicketListRetrieveSerializer(serializers.ModelSerializer):
+class TicketListRetrieveSerializer(BaseModelSerializer):
     class Meta:
         model = Ticket
         fields = '__all__'
 
 
-class TicketStatusSerializer(serializers.ModelSerializer):
+class TicketStatusSerializer(BaseModelSerializer):
     class Meta:
         model = Ticket
         fields = ['id', 'status', 'updated_at', 'closed_at', 'closed_by']
@@ -52,7 +53,7 @@ class TicketStatusSerializer(serializers.ModelSerializer):
         return instance
 
 
-class TicketAssignSerializer(serializers.ModelSerializer):
+class TicketAssignSerializer(BaseModelSerializer):
     assigned_to = serializers.PrimaryKeyRelatedField(
         queryset=User.objects.filter(role=User.Role.SUPPORT),
         error_messages={
