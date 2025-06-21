@@ -30,27 +30,31 @@ def send_status_change_notification_email(ticket_id, old_status, new_status):
         text_message = render_to_string('notifications/emails/status_change_notification.txt', context)
         html_message = render_to_string('notifications/emails/status_change_notification.html', context)
         
-        Notification.objects.create(
-            user=user,
-            title=f"Статус заявки #{ticket_id} изменён",
-            message=f"Статус изменён с {old_status} на {new_status}",
-            ticket=ticket,
-            is_read=False
-        )
-        
-        send_mail(
-            subject=subject,
-            message=text_message,
-            from_email=settings.EMAIL_HOST_USER,
-            recipient_list=[user.email],
-            html_message=html_message,
-            fail_silently=False
-        )
-
-        logger.info(
-            f"Email успешно отправлен пользователю {user.email} "
-            f"по тикету #{ticket.pk} (статус: {old_status} → {new_status})"
-        )
+        if new_status != old_status: 
+            Notification.objects.create(
+                user=user,
+                title=f"Статус заявки #{ticket_id} изменён",
+                message=f"Статус изменён с {old_status} на {new_status}",
+                ticket=ticket,
+                is_read=False
+            )
+            send_mail(
+                subject=subject,
+                message=text_message,
+                from_email=settings.EMAIL_HOST_USER,
+                recipient_list=[user.email],
+                html_message=html_message,
+                fail_silently=False
+            )
+            logger.info(
+                f"Email успешно отправлен пользователю {user.email} "
+                f"по тикету #{ticket.pk} (статус: {old_status} → {new_status})"
+            )
+        else:
+            logger.warning(
+                f"Статус тикета #{ticket.pk} не изменен, email-уведомление пользователю {user.email} "
+                "не было сформировано.  "
+            )
         
     except Ticket.DoesNotExist:
         logger.error(f"Не удалось найти тикет с id={ticket_id} при попытке отправки уведомления")
@@ -62,3 +66,5 @@ def send_status_change_notification_email(ticket_id, old_status, new_status):
         logger.exception(
             f"Ошибка при отправке уведомления по тикету #{ticket_id}: {e.__class__.__name__} - {e}"
         )
+
+
