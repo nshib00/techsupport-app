@@ -20,6 +20,8 @@ load_dotenv(find_dotenv())
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
 
+LOG_DIR = BASE_DIR / 'logs'
+LOG_DIR.mkdir(exist_ok=True)
 
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/5.1/howto/deployment/checklist/
@@ -30,7 +32,7 @@ SECRET_KEY = getenv('DJANGO_KEY')
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = ["*"]
+ALLOWED_HOSTS = ["127.0.0.1"]
 
 SITE_NAME = "TechSupport"
 
@@ -251,30 +253,69 @@ CHANNEL_LAYERS = {
 }
 
 
-# LOGGING = {
-#     'version': 1,
-#     'disable_existing_loggers': False,
-#     'handlers': {
-#         'console': {
-#             'class': 'logging.StreamHandler',
-#         },
-#         'file': {
-#             'level': 'DEBUG',
-#             'class': 'logging.FileHandler',
-#             'filename': 'debug.log',
-#         },
-#     },
-#     'loggers': {
-#         'django': {
-#             'handlers': ['console', 'file'],
-#             'level': 'DEBUG',
-#             'propagate': True,
-#         },
-#         'django.request': {
-#             'handlers': ['file'],
-#             'level': 'DEBUG',
-#             'propagate': False,
-#         },
-#     },
-# }
+LOGGING = {
+    'version': 1,
+    'disable_existing_loggers': False,
+    'formatters': {
+        'verbose': {
+            'format': '[{levelname}] {asctime} | {name}:{module}:{funcName}:{lineno} | {message}',
+            'style': '{',
+        }
+    },
+    'handlers': {
+        'console': {
+            'level': 'INFO',
+            'class': 'logging.StreamHandler',
+            'formatter': 'verbose',
+        },
+        'file': {
+            'level': 'DEBUG',
+            'class': 'logging.handlers.TimedRotatingFileHandler',
+            'filename': LOG_DIR / 'logs.log',
+            'when': 'midnight', # ротация логов каждый день в полночь
+            'interval': 1,
+            'backupCount': 5,
+            'formatter': 'verbose',
+            'encoding': 'utf-8',
+            'utc': False, 
+        },
+    },
+    'loggers': {
+        'django': {
+            'handlers': ['console', 'file'],
+            'level': 'INFO',
+            'propagate': True,
+        },
+        'django.request': {
+            'handlers': ['file'],
+            'level': 'INFO',
+            'propagate': False,
+        },
+        'rest_framework': {
+            'handlers': ['file'],
+            'level': 'INFO',
+            'propagate': False,
+        },
+        'celery': {
+            'handlers': ['file'],
+            'level': 'INFO',
+            'propagate': False,
+        },
+        'tickets': {
+            'handlers': ['file'],
+            'level': 'DEBUG',
+            'propagate': False,
+        },
+        'users': {
+            'handlers': ['file'],
+            'level': 'DEBUG',
+            'propagate': False,
+        },
+        'notifications.tasks': {
+            'handlers': ['file'],
+            'level': 'DEBUG',
+            'propagate': False,
+        },
+    },
+}
 

@@ -1,9 +1,14 @@
+import logging
+from smtplib import SMTPException
 from celery import shared_task
 from django.core.mail import send_mail
 from django.template.loader import render_to_string
 from techsupport import settings
 from techsupport.common.utils import sanitize_html
 from .models import Ticket, Notification
+
+
+logger = logging.getLogger(__name__)
 
 
 @shared_task
@@ -41,8 +46,19 @@ def send_status_change_notification_email(ticket_id, old_status, new_status):
             html_message=html_message,
             fail_silently=False
         )
+
+        logger.info(
+            f"Email успешно отправлен пользователю {user.email} "
+            f"по тикету #{ticket.pk} (статус: {old_status} → {new_status})"
+        )
         
     except Ticket.DoesNotExist:
-        print(f"Ticket {ticket_id} not found")
+        logger.error(f"Не удалось найти тикет с id={ticket_id} при попытке отправки уведомления")
+    except SMTPException as e:
+        logger.error(
+            f"SMTP ошибка при отправке уведомления по тикету #{ticket_id} на email {user.email}: {e}"
+        )
     except Exception as e:
-        print(f"Error sending notification: {e.__class__.__name__}: {e}")
+        logger.exception(
+            f"Ошибка при отправке уведомления по тикету #{ticket_id}: {e.__class__.__name__} - {e}"
+        )
