@@ -268,16 +268,14 @@ LOGGING = {
             'class': 'logging.StreamHandler',
             'formatter': 'verbose',
         },
-        "file": {
+        'file': {
             'level': 'INFO',
-            'class': 'logging.handlers.TimedRotatingFileHandler',
-            'filename': LOG_DIR / 'logs.log',
+            'class': 'logging.handlers.RotatingFileHandler',
+            'filename': BASE_DIR / 'logs.log',
+            'maxBytes': 1024 * 1024 * 5, # макс.размер одного файла с логами - 5 Мб
+            'backupCount': 3,
             'formatter': 'verbose',
-            'when': 'midnight', # ротация логов каждый день в полночь
-            'interval': 1,
-            'backupCount': 5,
             'encoding': 'utf-8',
-            'utc': False,
         },
     },
     'loggers': {
@@ -292,7 +290,7 @@ LOGGING = {
             'propagate': False,
         },
         'root': {
-            'handlers': ['console', 'file'],
+            'handlers': ['file'],
             'level': 'INFO',
             'propagate': True,
         },
