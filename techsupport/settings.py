@@ -21,7 +21,7 @@ load_dotenv(find_dotenv())
 BASE_DIR = Path(__file__).resolve().parent.parent
 
 LOG_DIR = BASE_DIR / 'logs'
-LOG_DIR.mkdir(exist_ok=True)
+LOG_DIR.mkdir(parents=True, exist_ok=True)
 
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/5.1/howto/deployment/checklist/
@@ -268,16 +268,16 @@ LOGGING = {
             'class': 'logging.StreamHandler',
             'formatter': 'verbose',
         },
-        'file': {
-            'level': 'DEBUG',
+        "file": {
+            'level': 'INFO',
             'class': 'logging.handlers.TimedRotatingFileHandler',
             'filename': LOG_DIR / 'logs.log',
+            'formatter': 'verbose',
             'when': 'midnight', # ротация логов каждый день в полночь
             'interval': 1,
             'backupCount': 5,
-            'formatter': 'verbose',
             'encoding': 'utf-8',
-            'utc': False, 
+            'utc': False,
         },
     },
     'loggers': {
@@ -291,30 +291,10 @@ LOGGING = {
             'level': 'INFO',
             'propagate': False,
         },
-        'rest_framework': {
-            'handlers': ['file'],
+        'root': {
+            'handlers': ['console', 'file'],
             'level': 'INFO',
-            'propagate': False,
-        },
-        'celery': {
-            'handlers': ['file'],
-            'level': 'INFO',
-            'propagate': False,
-        },
-        'tickets': {
-            'handlers': ['file'],
-            'level': 'DEBUG',
-            'propagate': False,
-        },
-        'users': {
-            'handlers': ['file'],
-            'level': 'DEBUG',
-            'propagate': False,
-        },
-        'notifications.tasks': {
-            'handlers': ['file'],
-            'level': 'DEBUG',
-            'propagate': False,
+            'propagate': True,
         },
     },
 }
