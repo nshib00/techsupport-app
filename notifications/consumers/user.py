@@ -3,8 +3,8 @@ from notifications.consumers.base import BaseNotificationConsumer
 
 class UserNotificationConsumer(BaseNotificationConsumer):
     async def connect(self):
-        await super().connect()
         user = self.scope['user']
+        await super().connect()
         self.group_name = f"user_{user.id}"
         await self.channel_layer.group_add(self.group_name, self.channel_name)
 

@@ -3,12 +3,14 @@ from smtplib import SMTPException
 from celery import shared_task
 from django.core.mail import send_mail
 from django.template.loader import render_to_string
+from asgiref.sync import async_to_sync
+from notifications.utils import check_and_get_channel_layer
 from techsupport import settings
 from techsupport.common.utils import sanitize_html
 from .models import Ticket, Notification
 
 
-logger = logging.getLogger(__name__)
+logger = logging.getLogger('celery')
 
 
 @shared_task
@@ -63,8 +65,91 @@ def send_status_change_notification_email(ticket_id, old_status, new_status):
             f"SMTP ошибка при отправке уведомления по тикету #{ticket_id} на email {user.email}: {e}"
         )
     except Exception as e:
-        logger.exception(
-            f"Ошибка при отправке уведомления по тикету #{ticket_id}: {e.__class__.__name__} - {e}"
+        logger.error(
+            f"Ошибка при отправке уведомления по тикету #{ticket_id}: {e.__class__.__name__}: {e}"
+        )
+
+
+@shared_task
+def notify_support_on_new_ticket_task(ticket_data):    
+    channel_layer = check_and_get_channel_layer()
+    try:
+        async_to_sync(channel_layer.group_send)(
+            "support",
+            {
+                "type": "notify_new_ticket",
+                "ticket_id": ticket_data["id"],
+                "subject": ticket_data["subject"],
+                "category": ticket_data["category"],
+                "user": ticket_data["user"],
+                "created_at": ticket_data["created_at"],
+                "link": ticket_data["link"],
+            }
+        )
+    except Exception as e:
+        logger.error(f"Ошибка при отправке уведомления поддержке о новом тикете: {e.__class__.__name__}: {e}")
+
+
+@shared_task
+def send_user_ticket_assigned_to_notification(user_id, ticket_id, task_data):
+    notification_title = task_data["title"]
+    notification_message = task_data["message"]
+
+    Notification.objects.create(
+        user_id=user_id,
+        title=notification_title,
+        message=notification_message,
+        ticket_id=ticket_id,
+        is_read=False
+    )
+
+    channel_layer = check_and_get_channel_layer()
+    try:
+        async_to_sync(channel_layer.group_send)(
+            f"user_{user_id}",
+            {
+                "type": "notify",
+                "data": {
+                    "title": notification_title,
+                    "message": notification_message,
+                }
+            }
+        )
+    except Exception as e:
+        logger.error(
+            f"Ошибка при отправке уведомления пользователю о назначении сотрудника на тикет: {e.__class__.__name__}: {e}"
+        )
+
+
+@shared_task
+def notify_about_new_ticket_comment(user_id, ticket_id, author, text):
+    notification_title = f'Новый комментарий к заявке #{ticket_id}'
+    notification_message = f'Пользователь {author} оставил(а) комментарий: "{text}"'
+
+    Notification.objects.create(
+        user_id=user_id,
+        title=notification_title,
+        message=notification_message,
+        ticket_id=ticket_id,
+        is_read=False
+    )
+
+    channel_layer = check_and_get_channel_layer()
+
+    try:
+        async_to_sync(channel_layer.group_send)(
+            f"user_{user_id}",
+            {
+                "type": "notify",
+                "data": {
+                    "title": notification_title,
+                    "message": notification_message,
+                }
+            }
+        )
+    except Exception as e:
+        logger.error(
+            f"Ошибка при отправке уведомления пользователю о новом комментарии к тикету: {e.__class__.__name__}: {e}"
         )
 
 
