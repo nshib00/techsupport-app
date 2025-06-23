@@ -25,6 +25,7 @@ dependencies = [
     "websockets (>=15.0.1,<16.0.0)",
     "nh3 (>=0.2.21,<0.3.0)",
     "django-filter (>=25.1,<26.0)",
+    "django-redis (>=6.0.0,<7.0.0)",
 ]
 
 

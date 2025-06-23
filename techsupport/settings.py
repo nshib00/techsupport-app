@@ -227,7 +227,6 @@ EMAIL_PORT = getenv('EMAIL_PORT')
 EMAIL_HOST_USER = getenv('EMAIL_USER')
 EMAIL_HOST_PASSWORD = getenv('EMAIL_PWD')
 EMAIL_USE_TLS = True
-DEFAULT_FROM_EMAIL = 'TechSupport <noreply@techsupport.com>'
 
 
 CORS_ALLOWED_ORIGINS = [

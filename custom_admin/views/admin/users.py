@@ -5,6 +5,8 @@ from rest_framework.permissions import IsAuthenticated
 from users.serializers import UserSerializer, UserRoleUpdateSerializer
 from drf_spectacular.utils import extend_schema, OpenApiParameter, OpenApiResponse
 from rest_framework.exceptions import ValidationError
+from django.views.decorators.cache import cache_page
+from django.utils.decorators import method_decorator
 
 
 @extend_schema(
@@ -24,6 +26,13 @@ from rest_framework.exceptions import ValidationError
         403: OpenApiResponse(description="Нет прав для просмотра списка пользователей"),
         500: OpenApiResponse(description='Внутренняя ошибка сервера'),
     }
+)
+@method_decorator(
+    cache_page(
+        timeout=60 * 5,
+        key_prefix='users_list'
+    ),
+    name='get'
 )
 class UserListView(ListAPIView):
     serializer_class = UserSerializer

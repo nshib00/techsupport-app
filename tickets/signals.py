@@ -1,4 +1,4 @@
-from django.db.models.signals import post_save, pre_save
+from django.db.models.signals import post_save, pre_save, post_delete
 from django.dispatch import receiver
 from notifications.tasks import (
     notify_about_new_ticket_comment,
@@ -8,6 +8,7 @@ from notifications.tasks import (
 from tickets.models.ticket_comment import TicketComment
 from .models import Ticket
 import logging
+from django.core.cache import cache
 
 logger = logging.getLogger(__name__)
 
@@ -76,3 +77,20 @@ def notify_about_new_comment(sender, instance, created, **kwargs):
         author=instance.user.username,
         text=comment_msg,
     )
+
+
+@receiver([post_save, post_delete], sender=Ticket)
+def clear_ticket_cache(sender, instance, **kwargs):
+    logger.info(f"[SIGNAL] Called clearing ticket cache for ticket #{instance.pk}")
+
+    detail_support_key = f"tickets_support_detail:{instance.pk}"
+    detail_user_key = f"tickets_user_detail:{instance.pk}"
+
+    # очистка кэша тикета по ID 
+    cache.delete(detail_support_key) 
+    cache.delete(detail_user_key) 
+
+    # очистка кэша всех списков тикетов
+    cache.delete("tickets_support_list")
+    cache.delete("tickets_user_list")
+

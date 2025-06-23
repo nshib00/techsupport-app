@@ -13,6 +13,9 @@ from tickets.serializers.tickets import (
 )
 from drf_spectacular.utils import extend_schema, extend_schema_view, OpenApiParameter, OpenApiResponse
 from notifications.tasks import send_status_change_notification_email
+from django.views.decorators.cache import cache_page
+from django.utils.decorators import method_decorator
+from django.core.cache import cache
 
 
 @extend_schema_view(
@@ -133,11 +136,32 @@ class TicketListRetrieveView(RetrieveModelMixin, ListModelMixin, GenericViewSet)
 
         return Ticket.objects.filter(**filters)
     
+    @method_decorator(
+        cache_page(
+            timeout=60 * 5,
+            key_prefix='tickets_support_list'
+        ),
+        name='get'
+    )
+    def list(self, request, *args, **kwargs):
+        return super().list(request, *args, **kwargs)
+    
+
     def retrieve(self, request, *args, **kwargs):
+        pk = kwargs.get("pk")
+
+        # используется ручное кэширование для назначения читаемых префиксов (id тикета),
+        # чтобы можно было при изменении конкретного тикета удалять очищать отдельно его кэш по префиксу
+        cache_key = f"tickets_support_detail:{pk}"
+        data = cache.get(cache_key)
+        if data:
+            return Response(data)
+
         try:
             instance = self.get_object()
         except Http404:
-            raise NotFound(detail="Ticket not found.")
+            raise NotFound("Ticket not found.")
 
         serializer = self.get_serializer(instance)
+        cache.set(cache_key, serializer.data, timeout=60*15)
         return Response(serializer.data)

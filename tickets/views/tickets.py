@@ -1,12 +1,18 @@
 from rest_framework import generics, serializers
 from rest_framework.permissions import IsAuthenticated
 from tickets.models.ticket import Ticket
+from rest_framework.response import Response
 from rest_framework.exceptions import NotFound, ValidationError
 from tickets.models.ticket_attachment import TicketAttachment
 from tickets.serializers.ticket_attachments import TicketAttachmentSerializer
 from tickets.serializers.consts import ALLOWED_EXTENSIONS
 from tickets.serializers.tickets import TicketListRetrieveSerializer, TicketSerializer
-from drf_spectacular.utils import extend_schema_view, extend_schema, inline_serializer, OpenApiResponse, OpenApiParameter
+from drf_spectacular.utils import (
+    extend_schema_view, extend_schema, inline_serializer, OpenApiResponse, OpenApiParameter
+)
+from django.views.decorators.cache import cache_page
+from django.utils.decorators import method_decorator
+from django.core.cache import cache
 
 
 @extend_schema_view(
@@ -58,6 +64,13 @@ from drf_spectacular.utils import extend_schema_view, extend_schema, inline_seri
             401: OpenApiResponse(description="Пользователь не авторизован")
         }
     )
+)
+@method_decorator(
+    cache_page(
+        timeout=60 * 5,
+        key_prefix='tickets_user_list'
+    ), 
+    name='get'
 )
 class TicketListCreateView(generics.ListCreateAPIView):
     serializer_class = TicketSerializer
@@ -127,6 +140,19 @@ class UserTicketsRetrieveView(generics.RetrieveAPIView):
         except Ticket.DoesNotExist:
             raise NotFound("Тикет не найден.")
         return ticket
+    
+    def retrieve(self, request, *args, **kwargs):
+        ticket_id = kwargs.get("pk")
+        cache_key = f"tickets_user_detail:{ticket_id}"
+
+        data = cache.get(cache_key)
+        if data:
+            return Response(data)
+
+        instance = self.get_object()
+        serializer = self.get_serializer(instance)
+        cache.set(cache_key, serializer.data, timeout=60*15)
+        return Response(serializer.data)
 
 
 
