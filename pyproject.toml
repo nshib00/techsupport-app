@@ -26,6 +26,8 @@ dependencies = [
     "nh3 (>=0.2.21,<0.3.0)",
     "django-filter (>=25.1,<26.0)",
     "django-redis (>=6.0.0,<7.0.0)",
+    "pytest-django (>=4.11.1,<5.0.0)",
+    "pytest-mock (>=3.14.1,<4.0.0)",
 ]
 
 

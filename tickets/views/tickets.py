@@ -30,7 +30,8 @@ from django.core.cache import cache
         ],
         responses={
             200: TicketSerializer(many=True),
-            401: OpenApiResponse(description="Пользователь не авторизован")
+            400: OpenApiResponse(description="Введен некорректный статус для фильтрации"),
+            401: OpenApiResponse(description="Пользователь не аутентифицирован")
         }
     ),
     post=extend_schema(
@@ -61,7 +62,7 @@ from django.core.cache import cache
         responses={
             201: TicketSerializer,
             400: OpenApiResponse(description="Неверные данные или ошибка валидации"),
-            401: OpenApiResponse(description="Пользователь не авторизован")
+            401: OpenApiResponse(description="Пользователь не аутентифицирован")
         }
     )
 )
