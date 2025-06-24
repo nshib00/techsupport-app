@@ -4,8 +4,7 @@ from tickets.mixins import TicketHistoryMixin
 from tickets.models.ticket import Ticket
 from tickets.serializers.ticket_attachments import TicketAttachmentSerializer
 from users.models import User
-from datetime import datetime
-
+from django.utils import timezone
 
 
 class TicketSerializer(BaseModelSerializer):
@@ -47,7 +46,7 @@ class TicketStatusSerializer(BaseModelSerializer, TicketHistoryMixin):
         instance.status = new_status
 
         if new_status == Ticket.Status.CLOSED and old_status != Ticket.Status.CLOSED:
-            instance.closed_at = datetime.now()
+            instance.closed_at = timezone.now()
             instance.closed_by = self.context['request'].user
         else:
             instance.closed_at = None

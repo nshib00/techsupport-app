@@ -5,7 +5,7 @@ from rest_framework.exceptions import NotFound, ValidationError
 from rest_framework.response import Response
 from rest_framework.permissions import IsAuthenticated
 from django.http import Http404
-from datetime import datetime
+from django.utils import timezone
 from users.permissions import IsSupportUser
 from tickets.models.ticket import Ticket
 from tickets.serializers.tickets import (
@@ -69,7 +69,7 @@ class TicketUpdateStatusView(UpdateAPIView):
         instance = serializer.save()
 
         if instance.status == Ticket.Status.CLOSED:
-            instance.closed_at = datetime.now()
+            instance.closed_at = timezone.now()
             instance.closed_by = self.request.user
             instance.save(update_fields=['closed_at', 'closed_by'])
         
