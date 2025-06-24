@@ -116,6 +116,7 @@ AUTH_PASSWORD_VALIDATORS = [
     },
     {
         'NAME': 'django.contrib.auth.password_validation.MinimumLengthValidator',
+        'OPTIONS': {'min_length': 8}
     },
     {
         'NAME': 'django.contrib.auth.password_validation.CommonPasswordValidator',
@@ -281,7 +282,7 @@ LOGGING = {
         'file': {
             'level': 'INFO',
             'class': 'logging.handlers.RotatingFileHandler',
-            'filename': BASE_DIR / 'logs.log',
+            'filename': LOG_DIR / 'logs.log',
             'maxBytes': 1024 * 1024 * 5, # макс.размер одного файла с логами - 5 Мб
             'backupCount': 3,
             'formatter': 'verbose',
