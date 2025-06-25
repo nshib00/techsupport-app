@@ -12,11 +12,11 @@ CORS_ALLOWED_ORIGINS = getenv("CORS_ALLOWED_ORIGINS", "").split(",")
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.postgresql',
-        'NAME': getenv('DB_NAME'),
-        'USER': getenv('DB_USER'),
-        'PASSWORD': getenv('DB_PWD'),
-        'HOST': getenv('DB_HOST'),
-        'PORT': getenv('DB_PORT'),
+        'NAME': getenv('POSTGRES_DB'),
+        'USER': getenv('POSTGRES_USER'),
+        'PASSWORD': getenv('POSTGRES_PASSWORD'),
+        'HOST': getenv('POSTGRES_HOST'),
+        'PORT': getenv('POSTGRES_PORT'),
     }
 }
 
@@ -29,4 +29,4 @@ EMAIL_HOST_USER = getenv('EMAIL_USER')
 EMAIL_HOST_PASSWORD = getenv('EMAIL_PWD')
 EMAIL_USE_TLS = True
 
-CELERY_BROKER_URL = getenv('REDIS_BROKER_URL', 'redis://localhost:6379/0')
+CELERY_BROKER_URL = getenv('CELERY_BROKER_URL', 'redis://localhost:6379/0')
