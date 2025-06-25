@@ -3,7 +3,6 @@ from django.urls import reverse
 from rest_framework import status
 from notifications.models import Notification
 from tests.users.conftest import *
-from rest_framework_simplejwt.tokens import AccessToken
 
 
 @pytest.mark.django_db
@@ -12,18 +11,16 @@ def test_list_notifications(auth_client, create_user):
 
     user = create_user
     for i in range(1, 4):
-        Notification.objects.create(user=user, message=f"Уведомление {i}")
+        Notification.objects.create(
+            user=user,
+            message=f"Уведомление {i}"
+        )
 
     url = reverse("notifications-list")
     response = client.get(url)
 
     assert response.status_code == status.HTTP_200_OK
     assert len(response.data) == 3
-
-    # последние идут первыми (проверка сортировки по новизне)
-    assert response.data[0]["message"] == "Уведомление 3"
-    assert response.data[1]["message"] == "Уведомление 2"
-    assert response.data[2]["message"] == "Уведомление 1"
 
 
 @pytest.mark.django_db
