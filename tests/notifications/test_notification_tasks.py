@@ -115,6 +115,6 @@ def test_notify_about_new_ticket_comment(create_ticket, mocker):
     channel, data = mock_group_send.call_args[0]
     assert channel == f'user_{user.pk}'
     assert data['type'] == 'notify'
-    assert str(user.pk) in data['data']['title']
+    assert str(ticket.pk) in data['data']['title']
     assert author in data['data']['message']
     assert text in data['data']['message']
