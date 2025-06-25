@@ -16,13 +16,8 @@ RUN poetry install --no-root
 
 COPY . .
 
-# Проверяем содержимое папки /app до и после копирования
-RUN echo "Before copy:" && ls -l /app
-
 RUN chmod +x ./docker/entrypoint.sh
 COPY ./docker/entrypoint.sh /app/entrypoint.sh
-
-RUN echo "After copy:" && ls -l /app
 
 ENV PYTHONDONTWRITEBYTECODE=1
 ENV PYTHONUNBUFFERED=1
