@@ -1,5 +1,5 @@
 from django.db import models
-from techsupport import settings
+from django.conf import settings
 from tickets.models.ticket import Ticket
 from uuid import uuid4
 from os.path import splitext

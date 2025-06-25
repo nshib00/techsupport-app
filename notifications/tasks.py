@@ -5,7 +5,7 @@ from django.core.mail import send_mail
 from django.template.loader import render_to_string
 from asgiref.sync import async_to_sync
 from notifications.utils import check_and_get_channel_layer
-from techsupport import settings
+from django.conf import settings
 from techsupport.common.utils import sanitize_html
 from .models import Ticket, Notification
 

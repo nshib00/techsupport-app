@@ -12,10 +12,12 @@ https://docs.djangoproject.com/en/5.1/ref/settings/
 
 from datetime import timedelta
 from pathlib import Path
-from dotenv import find_dotenv, load_dotenv
+from dotenv import load_dotenv, find_dotenv
 from os import getenv
+import os
 
-load_dotenv(find_dotenv())
+DJANGO_ENV = os.environ.get('DJANGO_ENV', 'dev').lower()
+load_dotenv(find_dotenv(f'.env.{DJANGO_ENV}'))
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -29,10 +31,8 @@ LOG_DIR.mkdir(parents=True, exist_ok=True)
 # SECURITY WARNING: keep the secret key used in production secret!
 SECRET_KEY = getenv('DJANGO_KEY')
 
-# SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
-
-ALLOWED_HOSTS = ["127.0.0.1"]
+DEBUG = False  # переопределяется в dev/prod
+ALLOWED_HOSTS = []
 
 SITE_NAME = "TechSupport"
 
@@ -95,19 +95,7 @@ WSGI_APPLICATION = 'techsupport.wsgi.application'
 ASGI_APPLICATION = 'techsupport.asgi.application'
 
 
-# Database
-# https://docs.djangoproject.com/en/5.1/ref/settings/#databases
 
-DATABASES = {
-    "default": {
-        "ENGINE": "django.db.backends.postgresql",
-        "NAME": getenv("DB_NAME"),
-        "USER": getenv("DB_USER"),
-        "PASSWORD": getenv("DB_PWD"),
-        "HOST": getenv("DB_HOST"),
-        "PORT": getenv("DB_PORT"),
-    }
-}
 
 # Password validation
 # https://docs.djangoproject.com/en/5.1/ref/settings/#auth-password-validators
@@ -134,11 +122,8 @@ AUTH_USER_MODEL = 'users.User'
 # https://docs.djangoproject.com/en/5.1/topics/i18n/
 
 LANGUAGE_CODE = 'ru-ru'
-
 TIME_ZONE = 'Europe/Moscow'
-
 USE_I18N = True
-
 USE_TZ = True
 
 
@@ -225,21 +210,9 @@ SPECTACULAR_SETTINGS = {
     'COMPONENT_SPLIT_REQUEST': True, 
 }
 
-EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
-EMAIL_HOST = getenv('EMAIL_HOST')
-EMAIL_PORT = getenv('EMAIL_PORT')
-EMAIL_HOST_USER = getenv('EMAIL_USER')
-EMAIL_HOST_PASSWORD = getenv('EMAIL_PWD')
-EMAIL_USE_TLS = True
+CORS_ALLOWED_ORIGINS = []
 
 
-CORS_ALLOWED_ORIGINS = [
-    "http://127.0.0.1:8000",
-    "http://localhost:8000",
-]
-
-
-CELERY_BROKER_URL = 'redis://localhost:6379/0'
 CELERY_ACCEPT_CONTENT = ['json']
 CELERY_TASK_SERIALIZER = 'json'
 CELERY_TIMEZONE = 'Europe/Moscow'
@@ -250,7 +223,7 @@ CHANNEL_LAYERS = {
     'default': {
         'BACKEND': 'channels_redis.core.RedisChannelLayer',
         'CONFIG': {
-            'hosts': ['redis://localhost:6379/1'],
+            'hosts': [getenv('REDIS_CHANNEL_URL', 'redis://localhost:6379/1')],
         },
     },
 }
@@ -259,7 +232,7 @@ CHANNEL_LAYERS = {
 CACHES = {
     "default": {
         "BACKEND": "django_redis.cache.RedisCache",
-        "LOCATION": "redis://localhost:6379/2",
+        "LOCATION": getenv("REDIS_CACHE_URL", "redis://localhost:6379/2"),
         "OPTIONS": {
             "CLIENT_CLASS": "django_redis.client.DefaultClient",
         }

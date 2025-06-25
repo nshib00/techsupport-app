@@ -1,5 +1,5 @@
 from django.db import models
-from techsupport import settings
+from django.conf import settings
 from tickets.models.ticket_category import TicketCategory
 
 
