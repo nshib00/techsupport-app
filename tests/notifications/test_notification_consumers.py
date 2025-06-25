@@ -49,8 +49,8 @@ async def test_support_notification_connect_and_receive(create_support_user, sup
         {
             "type": "notify_new_ticket",
             "ticket_id": 1,
-            "subject": "Не работает микроволновка",
-            "category": "Бытовая техника",
+            "subject": "Найден баг",
+            "category": "Ошибки в системе",
             "user": "user@example.com",
             "created_at": "2025-06-25T12:00:00Z",
             "link": "/tickets/1"
