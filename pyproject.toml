@@ -5,6 +5,7 @@ description = ""
 authors = [
     {name = "Nikita Shibaev",email = "nshib.54321@gmail.com"}
 ]
+package-mode = false
 readme = "README.md"
 requires-python = ">=3.11,<4.0"
 dependencies = [
