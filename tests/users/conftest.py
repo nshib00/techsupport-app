@@ -84,3 +84,21 @@ def auth_client(api_client, create_user):
 
     api_client.credentials(HTTP_AUTHORIZATION=f'Bearer {access_token}')
     return api_client, refresh_token
+
+
+@pytest.fixture
+def auth_support_client(api_client, create_support_user):
+    access_token = AccessToken.for_user(user=create_support_user)
+    refresh_token = RefreshToken.for_user(user=create_support_user)
+
+    api_client.credentials(HTTP_AUTHORIZATION=f'Bearer {access_token}')
+    return api_client, refresh_token
+
+
+@pytest.fixture
+def auth_admin_client(api_client, create_admin):
+    access_token = AccessToken.for_user(user=create_admin)
+    refresh_token = RefreshToken.for_user(user=create_admin)
+
+    api_client.credentials(HTTP_AUTHORIZATION=f'Bearer {access_token}')
+    return api_client, refresh_token
