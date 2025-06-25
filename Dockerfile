@@ -16,8 +16,8 @@ RUN poetry install --no-root
 
 COPY . .
 
-RUN chmod +x ./docker/entrypoint.sh
 COPY ./docker/entrypoint.sh /app/entrypoint.sh
+RUN chmod +x /app/entrypoint.sh
 
 ENV PYTHONDONTWRITEBYTECODE=1
 ENV PYTHONUNBUFFERED=1
