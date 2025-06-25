@@ -2,6 +2,9 @@ FROM python:3.12.5-slim
 
 WORKDIR /app
 
+# создание непривилегированного пользователя для celery
+RUN useradd -ms /bin/bash celeryuser
+
 RUN apt-get update && apt-get install -y \
     build-essential \
     libpq-dev \
@@ -15,6 +18,8 @@ RUN poetry config virtualenvs.create false
 RUN poetry install --no-root
 
 COPY . .
+
+RUN chown -R celeryuser:celeryuser /app
 
 COPY ./docker/entrypoint.sh /app/entrypoint.sh
 RUN chmod +x /app/entrypoint.sh

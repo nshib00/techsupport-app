@@ -15,6 +15,7 @@ services:
 
   celery:
     build: .
+    user: celeryuser
     command: celery -A techsupport worker --loglevel=info
     env_file:
       - .env.prod
