@@ -34,12 +34,22 @@ API системы обращения в техническую поддержк
 - `pytest-django`, `pytest-asyncio`, `pytest-mock` — плагины Pytest.
 
 
-## API-методы
+## Документация API
 
-### Краткий показ документации
+### Swagger UI
+
+Доступен по URL: `/api/v1/schema/swagger-ui`
+
+**Краткая демонстрация:**
 
 
-### Подробное описание
+
+
+
+
+
+
+### Подробное описание методов API
 
 Находится в руководстве пользователя.
 
@@ -63,7 +73,21 @@ API системы обращения в техническую поддержк
 `tests` - unit-тесты
 
 
-## Сборка проекта через Docker
+## Установка и запуск проекта
+
+
+### Через Docker
+
+
+**1. Клонируйте репозиторий**:
+
+`git clone https://github.com/nshib00/techsupport-app.git`
+
+**2. Перейдите в папку приложения**:
+
+`cd techsupport`
+
+**3. Соберите контейнеры и запустите Docker командой:**
 
 `docker-compose up -d --build`
 
@@ -71,35 +95,38 @@ API системы обращения в техническую поддержк
 
 `docker-compose exec web python manage.py createsuperuser`
 
+---
 
-## Установка проекта без Docker
+### Без Docker
 
-**Клонирование репозитория**:
+**1. Клонируйте репозиторий**:
 
 `git clone https://github.com/nshib00/techsupport-app.git`
 
 
-**Создание виртуального окружения (Poetry)**:
+**2. Создайте виртуальное окружение (Poetry)**:
 
 ```poetry install```
 
 
-**Активация Poetry**:
+**3. Активируйте Poetry**:
 
 ```poetry env activate```
 
 ```<копирование и вставка команды, которую выдаст poetry env activate>```
 
+
+**4. Запустите в разных терминалах Uvicorn, Redis и Celery:**
+
 **Uvicorn**:
 `uvicorn techsupport.asgi:application --host 127.0.0.1 --port 9000 --reload`
+
+! Вместо 9000 может быть любой другой порт.
 
 **Redis**:
 `redis-cli`
 
 **Celery**:
-`celery -A techsupport worker --loglevel=info --pool=threads`
+`celery -A techsupport worker --loglevel=info`
 
-
-## Документация OpenAPI (Swagger UI)
-Доступна по URL: `/api/v1/schema/swagger-ui`
-
+! Если запускаете Celery на Windows, добавьте аргумент `--pool=solo`, так как ...
