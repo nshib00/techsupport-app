@@ -196,6 +196,7 @@ DJOSER = {
     },
     "PASSWORD_RESET_CONFIRM_URL": "password/reset/confirm/{uid}/{token}",
     "SEND_CONFIRMATION_EMAIL": False,
+    'SEND_ACTIVATION_EMAIL': False,
     "PASSWORD_RESET_SHOW_EMAIL_NOT_FOUND": True,
 }
 
@@ -259,10 +260,11 @@ LOGGING = {
             'level': 'INFO',
             'class': 'logging.handlers.RotatingFileHandler',
             'filename': LOG_DIR / 'logs.log',
-            'maxBytes': 1024 * 1024 * 5, # макс.размер одного файла с логами - 5 Мб
-            'backupCount': 3,
+            'maxBytes': 1024 * 1024 * 10, # макс.размер одного файла с логами - 10 Мб
+            'backupCount': 5,
             'formatter': 'verbose',
             'encoding': 'utf-8',
+            "delay": True
         },
     },
     'loggers': {
@@ -284,3 +286,6 @@ LOGGING = {
     },
 }
 
+
+PASSWORD_HASHERS = ['django.contrib.auth.hashers.BCryptSHA256PasswordHasher']
+# django.contrib.auth.hashers.BCryptSHA256PasswordHasher
