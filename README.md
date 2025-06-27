@@ -112,6 +112,8 @@ API системы обращения в техническую поддержк
 ![techsupport_api](https://github.com/user-attachments/assets/bb222f5b-9dcb-43d7-b598-d0dd2af7fbdf)
 
 
+### Руководство пользователя
+
 Методы API подробно описаны в [руководстве пользователя](docs/user_guide.md).
 
 
