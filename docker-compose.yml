@@ -31,8 +31,17 @@ services:
       - .env.prod
     environment:
       - LANG=en_US.utf8
+      - POSTGRES_MAX_CONNECTIONS=1000
     restart: always
 
+  pgbouncer:
+    image: edoburu/pgbouncer:latest
+    env_file:
+      - .env.prod
+    ports:
+      - "6432:6432"
+    depends_on:
+      - db
 
   redis:
     image: redis:alpine
