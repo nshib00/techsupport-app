@@ -60,12 +60,12 @@ API системы обращения в техническую поддержк
 <a name="tools"></a> 
 ## ⚙️ Технологии и инструменты
 
-- **Python** (**Django** + **Django REST Framework**)
-- **PostgreSQL**
-- **Redis**
-- **Docker** + **Docker Compose**
-- **Nginx**
-- Хранение файлов: локальное
+- `Python` (`Django` + `Django REST Framework`)
+- `PostgreSQL`
+- `Redis`
+- `Docker` + `Docker Compose`
+- `Nginx`
+- **Хранение файлов:** локальное хранилище
 
 <a name="packages"></a> 
 ### 📦 Используемые зависимости
@@ -152,7 +152,9 @@ poetry env activate
 #### Запуск:
 
 **Uvicorn**:
-`uvicorn techsupport.asgi:application --host 127.0.0.1 --port 9000 --reload`
+`uvicorn techsupport.asgi:application --host 127.0.0.1 --port 9000`
+
+> Для перезагрузки сервера при изменении в коде добавьте аргумент `--reload`.
 
 > Вместо 9000 может быть любой другой порт.
 
@@ -170,3 +172,19 @@ Unix:
 Windows:
 
 `celery -A techsupport worker --loglevel=info --pool=solo`
+
+
+## Запуск тестов:
+
+### Unit-тесты (Pytest):
+
+Запустите в корне проекта команду:
+
+`pytest -v`
+
+
+### Нагрузочное тестирование (Locust)
+
+Из корня проекта:
+
+`locust -f tests/locust/locustfile.py`
