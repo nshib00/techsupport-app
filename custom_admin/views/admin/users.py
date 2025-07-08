@@ -7,6 +7,7 @@ from drf_spectacular.utils import extend_schema, OpenApiParameter, OpenApiRespon
 from rest_framework.exceptions import ValidationError
 from django.views.decorators.cache import cache_page
 from django.utils.decorators import method_decorator
+from django_filters.rest_framework import DjangoFilterBackend
 
 
 @extend_schema(
@@ -37,16 +38,10 @@ from django.utils.decorators import method_decorator
 class UserListView(ListAPIView):
     serializer_class = UserSerializer
     permission_classes = [IsAdminUser, IsAuthenticated]
+    filter_backends = [DjangoFilterBackend]
+    filterset_fields = ['role']
+    queryset = User.objects.all()
 
-    def get_queryset(self):
-        role = self.request.GET.get('role')
-        if role is not None:
-            valid_roles = [choice[0] for choice in User.Role.choices]
-            if role not in valid_roles:
-                raise ValidationError({'role': f'Недопустимое значение. Возможные значения: {", ".join(valid_roles)}'})
-            return User.objects.filter(role=role)
-        return User.objects.all()
-    
 
 @extend_schema(
     summary="Изменение роли пользователя",

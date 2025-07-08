@@ -6,6 +6,7 @@ from rest_framework.response import Response
 from rest_framework.permissions import IsAuthenticated
 from django.http import Http404
 from django.utils import timezone
+from django_filters.rest_framework import DjangoFilterBackend 
 from users.permissions import IsSupportUser
 from tickets.models.ticket import Ticket
 from tickets.serializers.tickets import (
@@ -122,19 +123,9 @@ class TicketUpdateStatusView(UpdateAPIView):
 class TicketListRetrieveView(RetrieveModelMixin, ListModelMixin, GenericViewSet):
     serializer_class = TicketListAdminSerializer
     permission_classes = [IsSupportUser, IsAuthenticated]
-
-    def get_queryset(self):
-        filters = {
-            'status': self.request.GET.get('status'),
-            'assigned_to': self.request.GET.get('assigned_to'),
-            'category': self.request.GET.get('category'),
-        }
-
-        filters = {
-            key: value for key, value in filters.items() if value is not None
-        } # удаление пар со значением None
-
-        return Ticket.objects.filter(**filters)
+    filter_backends = [DjangoFilterBackend]
+    filterset_fields = ['status', 'assigned_to', 'category']
+    queryset = Ticket.objects.all()
     
     @method_decorator(
         cache_page(

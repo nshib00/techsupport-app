@@ -3,6 +3,7 @@ from rest_framework.permissions import IsAuthenticated
 from tickets.models.ticket import Ticket
 from rest_framework.response import Response
 from rest_framework.exceptions import NotFound, ValidationError
+from django_filters.rest_framework import DjangoFilterBackend
 from tickets.models.ticket_attachment import TicketAttachment
 from tickets.serializers.ticket_attachments import TicketAttachmentSerializer
 from tickets.serializers.consts import ALLOWED_EXTENSIONS
@@ -76,18 +77,11 @@ from django.core.cache import cache
 class TicketListCreateView(generics.ListCreateAPIView):
     serializer_class = TicketSerializer
     permission_classes = [IsAuthenticated]
+    filter_backends = [DjangoFilterBackend]
+    filterset_fields = ['status']
 
     def get_queryset(self):
-        queryset = Ticket.objects.filter(user=self.request.user)
-        status = self.request.GET.get('status')
-        if status is not None:
-            valid_status_names = [st[0] for st in Ticket.Status.choices]
-            if status not in valid_status_names:
-                raise ValidationError(
-                    {'status': f'Недопустимое значение. Возможные значения: {", ".join(valid_status_names)}'}
-                )
-            return queryset.filter(status=status)
-        return queryset
+        return Ticket.objects.filter(user=self.request.user)
 
     def perform_create(self, serializer):
         attachments = self.request.FILES.getlist('attachments')
