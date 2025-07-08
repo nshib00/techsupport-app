@@ -1,4 +1,4 @@
-from django_filters import FilterSet, DateTimeFilter, NumberFilter, CharFilter
+from django_filters.rest_framework import FilterSet, DateTimeFilter, NumberFilter, CharFilter
 from tickets.models import TicketHistory
 
 

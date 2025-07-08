@@ -43,3 +43,7 @@ class User(AbstractUser):
 
     def is_support(self) -> bool:
         return self.role == self.Role.SUPPORT
+    
+    @property
+    def roles(self):
+        return [role.value for role in self.Role]
